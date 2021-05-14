@@ -1,0 +1,40 @@
+version: '3.1'
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: ./project/.docker/Dockerfile
+    restart: always
+    command: sh start.sh
+    ports:
+      - "3333:3333"
+    volumes:
+      - ./project:/app
+    links:
+      - db:db
+    depends_on:
+      - db
+    networks:
+      - compasso_recrumento
+
+  db:
+    image: postgres:9.6
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: compasso
+      POSTGRES_DB: compasso
+    volumes:
+      - "./data:/var/lib/postgresql/data"
+    networks:
+      - compasso_recrumento
+
+networks:
+  compasso_recrumento:
+    ipam:
+      config:
+        - subnet: 172.196.0.0/16
